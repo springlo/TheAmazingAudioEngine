@@ -2289,6 +2289,11 @@ NSTimeInterval AEAudioControllerOutputLatency(AEAudioController *controller) {
     }
 }
 
+static void IsInterAppConnectedCallback(void *inRefCon, AudioUnit inUnit, AudioUnitPropertyID inID, AudioUnitScope inScope, AudioUnitElement inElement) {
+    AEAudioController *THIS = inRefCon;
+    [THIS updateInputDeviceStatus];
+}
+
 - (void)configureAudioUnit {
     if ( _inputEnabled ) {
         // Enable input
@@ -2334,6 +2339,9 @@ NSTimeInterval AEAudioControllerOutputLatency(AEAudioController *controller) {
     UInt32 maxFPS = 4096;
     checkResult(AudioUnitSetProperty(_ioAudioUnit, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 0, &maxFPS, sizeof(maxFPS)),
                 "AudioUnitSetProperty(kAudioUnitProperty_MaximumFramesPerSlice)");
+
+    checkResult(AudioUnitAddPropertyListener(_ioAudioUnit, kAudioUnitProperty_IsInterAppConnected, IsInterAppConnectedCallback, self),
+                "AudioUnitAddPropertyListener(kAudioUnitProperty_IsInterAppConnected)");
 }
 
 - (void)teardown {
