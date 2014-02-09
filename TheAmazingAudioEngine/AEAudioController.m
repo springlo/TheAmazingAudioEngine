@@ -2291,7 +2291,8 @@ NSTimeInterval AEAudioControllerOutputLatency(AEAudioController *controller) {
 
 static void IsInterAppConnectedCallback(void *inRefCon, AudioUnit inUnit, AudioUnitPropertyID inID, AudioUnitScope inScope, AudioUnitElement inElement) {
     AEAudioController *THIS = inRefCon;
-    [THIS updateInputDeviceStatus];
+    if(THIS->_inputEnabled)
+        [THIS updateInputDeviceStatus];
 }
 
 - (void)configureAudioUnit {
